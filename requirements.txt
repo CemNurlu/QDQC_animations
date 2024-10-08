@@ -3,3 +3,4 @@ qutip
 matplotlib
 tqdm
 moviepy
+scipy
