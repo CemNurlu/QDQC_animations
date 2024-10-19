@@ -12,9 +12,6 @@ from matplotlib.patches import FancyArrowPatch
 ##########################
 # LONGER DURATIONS FOR ACTUAL ANIMATION
 ##########################
-
-
-
 N_time = 850
 t_0 = 10 # Show bloch sphere
 t_1 = 510 # Show time evolution of all spins
@@ -44,7 +41,6 @@ if DEBUG:
    t_6 //= 5
    t_7 //= 5
    t_8 //= 5
-    
 
 
 bloch_mosaic = [["bloch", "plot"]]
@@ -117,7 +113,7 @@ fitted_spin_avg_x = np.sin(theta)*np.cos(omega_fit*B_time + phi_fit)*np.exp(-B_t
 fitted_spin_avg_y = np.sin(theta)*np.sin(omega_fit*B_time + phi_fit)*np.exp(-B_time/tau_fit)
 fitted_spin_avg_z = np.cos(theta)*np.ones_like(B_time)
 fitted_spin_avg = np.stack((fitted_spin_avg_x, fitted_spin_avg_y, fitted_spin_avg_z), axis=1)
-fitted_exp = np.sin(theta)*np.exp(-B_time/tau_fit) 
+fitted_exp = np.sin(theta)*np.exp(-B_time/tau_fit)
 
 pretty_axises_B = []
 for s_i in range(n_spins):
@@ -207,7 +203,7 @@ def animate(i):
         local_t_i = (i - t_0 - 1)%frames_per_spin
 
         tail = frames_per_spin//10
-        
+
 
         if local_t_i <= 0.1*frames_per_spin:
             new_alpha = local_t_i /(0.1* frames_per_spin)
@@ -218,7 +214,7 @@ def animate(i):
         elif local_t_i <= 0.9*frames_per_spin:
 
             B_time_index = int((len(B_time) - 1) * (local_t_i-0.1*frames_per_spin) /(0.8*frames_per_spin))
-            
+
             sphere_dict["bloch"].vectors = []
             sphere_dict["bloch"].points = []
             sphere_dict["bloch"].vector_color = ["red", vector_colors[s_i+1]]
@@ -230,7 +226,7 @@ def animate(i):
             if tail > B_time_index:
                 sphere_dict["bloch"].add_points(spin_vectors[s_i,0:B_time_index+1].T, meth = "l")
             else:
-                
+
                 sphere_dict["bloch"].add_points(spin_vectors[s_i,B_time_index-tail+1:B_time_index+1].T, meth = "l")
             sphere_dict["bloch"].make_sphere()
 
@@ -246,10 +242,10 @@ def animate(i):
                 new_alpha = 1
             else:
                 new_alpha = (local_t_i - 0.9*frames_per_spin) / ( 0.1 * frames_per_spin)
-            
+
             x_0_target = s_i * 2/n_spins
-            
-            x1_target = (s_i+0.9) * 2/n_spins 
+
+            x1_target = (s_i+0.9) * 2/n_spins
             x_height_target = 0.1 + 1.08/n_spins/6
 
             y_0_target = 0.1
@@ -263,35 +259,35 @@ def animate(i):
                         -0.2 + (y_1_target + 0.2) * new_alpha,
                         new_x_pos[0])
 
-            pretty_axises_B[s_i].update_x_y_pos(new_x_pos, new_y_pos)   
+            pretty_axises_B[s_i].update_x_y_pos(new_x_pos, new_y_pos)
 
         if i == t_1 - 1:
             sphere_dict["bloch"].vectors = []
             sphere_dict["bloch"].points = []
             sphere_dict["bloch"].vector_color = ["black"]
             sphere_dict["bloch"].point_color = ["black"]
-            sphere_dict["bloch"].make_sphere()                 
+            sphere_dict["bloch"].make_sphere()
 
     elif i <= t_2:
         new_alpha = ( t_2 - i) / (t_2 - t_1)
-        
+
         for s_i in range(n_spins):
             pretty_axises_B[s_i].alpha = new_alpha
-        
-        new_y_pos = ( y_lim_max - 2.1  + (-3.8 - (y_lim_max - 2.1) ) * new_alpha, 
-                    y_lim_max - 0.1  + (-1.8 - (y_lim_max - 0.1) ) * new_alpha, 
+
+        new_y_pos = ( y_lim_max - 2.1  + (-3.8 - (y_lim_max - 2.1) ) * new_alpha,
+                    y_lim_max - 0.1  + (-1.8 - (y_lim_max - 0.1) ) * new_alpha,
                     0)
 
         new_x_pos = ( 0,
-                    2, 
+                    2,
                     (new_y_pos[0] + new_y_pos[1])/2)
-                    
+
         pretty_axis_spins.update_x_y_pos(new_x_pos, new_y_pos)
 
     elif i <= t_3:
         new_alpha = (i - t_2) / (t_3 - t_2)
         avg_eq.set_alpha(new_alpha)
-    
+
     elif i <= t_4:
         pass
 
@@ -301,14 +297,14 @@ def animate(i):
         new_avg_eq_x, new_avg_eq_y = avg_eq_x_y_start + (avg_eq_x_y_end - avg_eq_x_y_start) * new_alpha
         new_size = avg_eq_start_size + (avg_eq_end_size - avg_eq_start_size) * new_alpha
         avg_eq.set(x = new_avg_eq_x, y = new_avg_eq_y, fontsize = new_size)
-    
+
 
     elif i <= t_6:
         new_alpha = (i - t_5) / (t_6 - t_5)
         B_time_index = int((len(B_time) - 1) * new_alpha)
         for s_i in range(n_spins):
             pretty_axis_spins.update_line(f"spin_{s_i}_x", B_time[:B_time_index+1], spin_vectors[s_i,:B_time_index+1,0])
-        
+
         pretty_axis_spin_avg.update_line("S_x_avg", B_time[:B_time_index+1], fitted_spin_avg[:B_time_index+1,0])
         sphere_dict["bloch"].vectors = []
         sphere_dict["bloch"].add_vectors(fitted_spin_avg[B_time_index])
@@ -324,21 +320,21 @@ def animate(i):
         new_x_pos = ( 0,
                     2, 
                     (new_y_pos[0] + new_y_pos[1])/2)
-        
+
         pretty_axis_spin_avg.update_x_y_pos(new_x_pos, new_y_pos)
         pretty_axis_spins.alpha = new_alpha
         avg_eq.set_alpha(new_alpha)
 
-    
+
 
     elif i <= t_8:
         if i == t_7+1:
             pretty_axis_spin_avg.add_line("pos_env", B_time, fitted_exp, c = "silver", linestyle = "--", alpha = 0, lw = 1.5)
             pretty_axis_spin_avg.add_line("neg_env", B_time, -fitted_exp, c = "silver", linestyle = "--", alpha = 0, lw = 1.5)
-        
+
         new_alpha = (i - t_7) / (t_8 - t_7)
         pretty_axis_fourier.alpha = new_alpha
-        
+
         pretty_axis_spin_avg._plot_lines["pos_env"].set_alpha(new_alpha)
         pretty_axis_spin_avg._plot_lines["neg_env"].set_alpha(new_alpha)
         omega_L_text.set_alpha(new_alpha)
@@ -355,7 +351,7 @@ def init():
 
 
 ani = anim.FuncAnimation(fig, animate, tqdm(range(N_time)), interval=50,
-                            init_func=init, 
+                            init_func=init,
                             blit=False, repeat=False)
 
 cache_then_save_funcanimation(ani, f'animations/test/hom_broadening_L0_new.{file_type}', fps = 20 )
