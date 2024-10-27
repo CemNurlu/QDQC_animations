@@ -66,28 +66,42 @@ def calculate_rotating_frame_B_fields(phi, settings):
     return B_drive
 
 def update_bloch_sphere_vectors(i, sphere_dict, ax_dict, B_zeeman_lab, B_drive_lab, B_total_lab, B_drive_rot, azim_angle_rot_sphere, settings):
-    t_0, t_1, t_2, t_8, t_11 = settings['time_list'][0], settings['time_list'][1], settings['time_list'][2], settings['time_list'][8], settings['time_list'][11]
+    t_0, t_1, t_2, t_8, t_11, t_13, t_14 = [settings['time_list'][i] for i in [0, 1, 2, 8, 11, 13, 14]]
     if t_1 < i <= t_2:
         new_alpha = (i-t_1)/(t_2-t_1)
         sphere_dict["bloch_lab"].vector_alpha = [1,1,new_alpha]
 
-    B_time_index = i - t_0 - 1
-    sphere_dict["bloch_lab"].vectors = []
-    sphere_dict["bloch_lab"].add_vectors([B_zeeman_lab[B_time_index], B_drive_lab[B_time_index], B_total_lab[B_time_index]])
-    sphere_dict["bloch_lab"].make_sphere()
+    if i < t_11:
+        B_time_index = i - t_0 - 1
+        sphere_dict["bloch_lab"].vectors = []
+        sphere_dict["bloch_lab"].add_vectors([B_zeeman_lab[B_time_index], B_drive_lab[B_time_index], B_total_lab[B_time_index]])
+        sphere_dict["bloch_lab"].make_sphere()
 
     if t_8 < i <= t_11:
+        B_time_index = i - t_0 - 1
         coefficent = (i-t_8-1)/(t_11-t_8-1)
         B_zeeman_auxvector = (1-coefficent)*B_zeeman_lab[i]
         B_total_auxvector = (1-coefficent)*B_total_lab[0] + coefficent*B_drive_lab[0]
         B_zeeman_auxvector = np.sign(B_zeeman_auxvector)*np.maximum(np.abs(B_zeeman_auxvector), settings['arrow_length'])
         sphere_dict["bloch_rot"].vectors = []
-        sphere_dict["bloch_rot"].add_vectors([B_zeeman_auxvector,B_drive_rot[B_time_index], B_total_auxvector])
+        sphere_dict["bloch_rot"].add_vectors([B_zeeman_auxvector, B_drive_rot[B_time_index], B_total_auxvector])
+        ax_dict["bloch_rot"].azim = azim_angle_rot_sphere[i]
+        sphere_dict["bloch_rot"].make_sphere()
+
+    phi = np.linspace(settings["phi_0"], settings['phi_end'] + 10*np.pi, t_14-t_0)
+    azim_angle_rot_sphere = (-60 - phi[:] * 180 / np.pi) % 360
+    if t_11 < i <= t_13:
+        B_zeeman_auxvector = np.array([0,0,0])
+        B_total_auxvector = B_drive_lab[0]
+        B_zeeman_auxvector = np.sign(B_zeeman_auxvector)*np.maximum(np.abs(B_zeeman_auxvector), settings['arrow_length'])
+
+        sphere_dict["bloch_rot"].vectors = []
+        sphere_dict["bloch_rot"].add_vectors([B_zeeman_auxvector, B_drive_rot[-1], B_total_auxvector])
         ax_dict["bloch_rot"].azim = azim_angle_rot_sphere[i]
         sphere_dict["bloch_rot"].make_sphere()
 
 
-    if i > t_11:
-        sphere_dict["bloch_rot"].vectors = []
-        sphere_dict["bloch_rot"].add_vectors([[0,0,0,],[0,0,0],B_drive_rot[B_time_index]])
-        sphere_dict["bloch_rot"].make_sphere()
+    # if i > t_13:
+    #     sphere_dict["bloch_rot"].vectors = []
+    #     sphere_dict["bloch_rot"].add_vectors([[0,0,0,],[0,0,0],B_drive_rot[B_time_index]])
+    #     sphere_dict["bloch_rot"].make_sphere()

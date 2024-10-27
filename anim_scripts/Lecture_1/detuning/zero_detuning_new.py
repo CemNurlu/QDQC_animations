@@ -18,7 +18,7 @@ from anim_base import (
 ##########################
 # LONGER DURATIONS FOR ACTUAL ANIMATION
 ##########################
-N_time = 570
+N_time = 600
 t_0 = 20 # Show lab bloch sphere
 t_1 = 100 # Show lab time evolution
 t_2 = 120 # Show H lab text
@@ -39,7 +39,7 @@ t_15 = N_time
 ##########################
 # SHORTER DURATIONS FOR DEBUGGING
 ##########################
-DEBUG = True
+DEBUG = False
 if DEBUG:
     N_time //= 10
     t_0 //= 10
@@ -57,6 +57,7 @@ if DEBUG:
     t_12 //= 10
     t_13 //= 10
     t_14 //= 10
+    t_15 //= 10
 
 time_list = (t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9, t_10, t_11, t_12, t_13, t_14, t_15)
 bloch_mosaic = [["bloch_lab", "plot_between", "bloch_rot"],
@@ -70,6 +71,9 @@ settings = {
     "arrow_length": 0.2,
     "time_list": time_list,
     "vector_colors": ["maroon", "hotpink", "red"],
+    "intial_sphere_alpha": 0.2,
+    "initial_frame_alpha": 0.2,
+    "intial_font_alpha": 1,
 }
 
 bloch_kwargs = [{
@@ -102,7 +106,9 @@ B_lab_H_text, B_lab_H_zeeman_text, B_lab_H_drive_text, B_lab_H_zeeman_eq, B_lab_
 B_rot_H_text, B_rot_H_zeeman_text, B_rot_H_drive_text, B_rot_H_zeeman_eq, B_rot_H_drive_eq_1, B_rot_H_drive_eq_2 = B_rot_texts
 W_trans_equation, W_trans_arrow, omega_is_omega_L = transformation_texts
 
+
 def animate(i):
+    first = True
     if i <= t_0:
         sphere_dict["bloch_lab"].make_sphere()
     if t_0 < i <= t_13:
@@ -119,13 +125,31 @@ def animate(i):
         fade_in_texts(i, t_7, t_8, [B_rot_H_text, B_rot_H_zeeman_text, B_rot_H_drive_text])
     if t_9 < i <= t_10:
         fade_in_texts(i, t_9, t_10, [B_rot_H_zeeman_eq, B_rot_H_drive_eq_1, B_rot_H_drive_eq_2])
-    if t_13 < i <= t_14:
-        sphere_dict["bloch_rot"].upda
+    if t_12 < i <= t_15:
+        if first:
+            current_position = ax_dict['bloch_rot'].get_position()
+            first = False
 
-    return [ax for key, ax in ax_dict.items()]
+        new_alpha_sphere = (i - t_12)/(t_15-t_12) * settings['initial_frame_alpha']
+        new_alpha_font = (i - t_12)/(t_15 - t_12) * settings['intial_font_alpha']
+        # print(- (i - t_12) * (current_position.x0 - ax_dict['bloch_lab'].get_position().x0) / (t_15 - t_12) + current_position.x0)
+
+        next_position = [
+            - (i - t_12) * (current_position.x0 - ax_dict['bloch_lab'].get_position().x0) / (t_15 - t_12) + current_position.x0,
+            current_position.y0,
+            current_position.width,
+            current_position.height
+        ]
+        ax_dict['bloch_rot'].set_position(next_position)
+        sphere_dict['bloch_lab'].sphere_alpha = new_alpha_sphere
+        sphere_dict['bloch_lab'].frame_alpha = new_alpha_sphere
+        sphere_dict['bloch_lab'].font_color = (0, 0, 0, new_alpha_font)
+        sphere_dict['bloch_lab'].make_sphere()
+
+    return list(ax_dict.values())
 
 def init():
-    return [ax for key, ax in ax_dict.items()]
+    return list(ax_dict.values())
 
 ani = anim.FuncAnimation(
     fig,
