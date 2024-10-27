@@ -8,64 +8,8 @@ from tqdm import tqdm
 import random
 from matplotlib.patches import FancyArrowPatch
 
-# Constants and parameters
-DEBUG = False
-N_time, t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9 = (850, 10, 510, 540, 560, 610, 640, 740, 770, 790, 850)
-n_spins, n_omegas = 5, 5
-B_time_start, B_time_end, B_0, B_fluctuation_multiplier = 0, 25, 1.5, 2
-SEED, theta, gridspec_kw = 12378, np.pi/3, {"height_ratios": [1], "width_ratios": [1, 1.8]}
-
-# Debug mode
-if DEBUG:
-    N_time = N_time // 5
-    t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8 = [x // 5 for x in (t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8)]
-
-# Initialize
-vector_colors = ["red", "blue", "green", "purple", "orange", "cyan", "pink", "yellow"]
-bloch_kwargs = {"vector_color": vector_colors, "vector_width": 3}
-fig, ax_dict, sphere_dict = prepare_bloch_mosaic([["bloch", "plot"]], (14, 8), bloch_kwargs, gridspec_kw=gridspec_kw)
-ax_dict["plot"].set_axis_off()
-np.random.seed(SEED)
-
-settings = {
-    "n_spins": n_spins,
-    "n_omegas": n_omegas,
-    "B_time_start": B_time_start,
-    "B_time_end": B_time_end,
-    "B_0": B_0,
-    "B_fluctuation_multiplier": B_fluctuation_multiplier,
-    "t_1": t_1,
-    "t_0": t_0,
-    "theta": theta,
-}
-
-B_time, B, B_min, B_max, phi = create_random_B_fields(**settings)
-S_x_max = np.sin(theta)
-
-# Spin vectors and fitted average
-fitted_spin_avg, spin_vectors = fit_spin_evolutions(ax_dict, B_time, phi, **settings)
-
-# Axis setup for B(t) and spin evolution
-pretty_axes_B = create_B_field_axes(ax_dict, B_time, B, B_min, B_max, **settings)
-
-pretty_axis_spin_avg, pretty_axes_spins = create_spin_evolution_axes(ax_dict, B_time, S_x_max, fitted_spin_avg, **settings)
-
-pretty_axis_fourier, omega_L_text, T2_arrow, T2_text, T2_inv_arrow, T2_inv_text = create_fourier_visualization(ax_dict)
-
-eq_text = create_equation_text(ax_dict)
-
-settings.update({
-    "B_time": B_time,
-    "B": B,
-    "B_min": B_min,
-    "B_max": B_max,
-    "vector_colors": vector_colors,
-    "spin_vectors": spin_vectors,
-    "fitted_spin_avg": fitted_spin_avg,
-    "S_x_max": S_x_max,
-})
-
 def init():
+    sphere_dict["bloch"].make_sphere()
     return [ax for key, ax in ax_dict.items()]
 
 
@@ -129,6 +73,58 @@ def show_fourier_transform(i):
     # Logic for Fourier transform visualization
     pass
 
+# Constants and parameters
+DEBUG = False
+N_time, t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9 = (850, 10, 510, 540, 560, 610, 640, 740, 770, 790, 850)
+n_spins, n_omegas = 5, 5
+B_time_start, B_time_end, B_0, B_fluctuation_multiplier = 0, 25, 1.5, 2
+SEED, theta, gridspec_kw = 12378, np.pi/3, {"height_ratios": [1], "width_ratios": [1, 1.8]}
+
+# Debug mode
+if DEBUG:
+    N_time = N_time // 5
+    t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8 = [x // 5 for x in (t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8)]
+
+# Initialize
+vector_colors = ["red", "blue", "green", "purple", "orange", "cyan", "pink", "yellow"]
+bloch_kwargs = {"vector_color": vector_colors, "vector_width": 3}
+fig, ax_dict, sphere_dict = prepare_bloch_mosaic([["bloch", "plot"]], (14, 8), bloch_kwargs, gridspec_kw=gridspec_kw)
+ax_dict["plot"].set_axis_off()
+np.random.seed(SEED)
+
+# Create a dictionary containing all settings of the animation
+settings = {
+    "n_spins": n_spins,
+    "n_omegas": n_omegas,
+    "B_time_start": B_time_start,
+    "B_time_end": B_time_end,
+    "B_0": B_0,
+    "B_fluctuation_multiplier": B_fluctuation_multiplier,
+    "t_1": t_1,
+    "t_0": t_0,
+    "theta": theta,
+}
+
+# Initialization steps for setting up the components of the animation
+B_time, B, B_min, B_max, phi = create_random_B_fields(**settings)
+fitted_spin_avg, spin_vectors = fit_spin_evolutions(ax_dict, B_time, phi, **settings)
+pretty_axes_B = create_B_field_axes(ax_dict, B_time, B, B_min, B_max, **settings)
+pretty_axis_spin_avg, pretty_axes_spins = create_spin_evolution_axes(ax_dict, B_time, np.sin(theta), fitted_spin_avg, **settings)
+pretty_axis_fourier, omega_L_text, T2_arrow, T2_text, T2_inv_arrow, T2_inv_text = create_fourier_visualization(ax_dict)
+eq_text = create_equation_text(ax_dict)
+
+settings.update({
+    "B_time": B_time,
+    "B": B,
+    "B_min": B_min,
+    "B_max": B_max,
+    "vector_colors": vector_colors,
+    "spin_vectors": spin_vectors,
+    "fitted_spin_avg": fitted_spin_avg,
+    "S_x_max": np.sin(theta),
+})
+
+# Define all scenes and their corresponding logic and timing
 animation_phases = {
     (0, t_0): lambda i: None,
     (t_0, t_1): animate_spins,
@@ -148,7 +144,6 @@ def animate(i):
             func(i)
             return [ax for key, ax in ax_dict.items()]
 
-
-# Running the animation
-anim_func = anim.FuncAnimation(fig, animate, frames=tqdm(range(N_time)), interval=50, init_func=init, blit=False)
-cache_then_save_funcanimation(anim_func, f'animations/test/hom_broadening_L0_timo.{file_type}', fps = 20)
+# Create and save the animation
+anim_func = anim.FuncAnimation(fig, animate, frames=tqdm(range(N_time)), interval=50, init_func=init, blit=True)
+cache_then_save_funcanimation(anim_func, f'animations/test/hom_broadening_L0_timo.{file_type}', fps=20)
