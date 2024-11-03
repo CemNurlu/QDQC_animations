@@ -2,6 +2,29 @@ import numpy as np
 from matplotlib.patches import FancyArrowPatch
 from anim_base import math_fontfamily
 
+def linear(x, a, b):
+    return a * x + b
+
+def linear_between(x, x_start, x_end, y_start, y_end):
+    return  (x - x_start)/(x_end - x_start) * (y_end - y_start) + y_start
+
+def interpolate_between(x, x_start, x_end, y_start, y_end, interpolation_function = linear_between):
+    assert x_start <= x <= x_end, f"Value of the variable {x:.2f} must stay between x_start and x_end [{x_start:.1f}, {x_end:.1f}]"
+    if isinstance(interpolation_function, str):
+        if interpolation_function == "sigmoid":
+            interpolation_function = sigmoid_between
+        else:
+            raise NotImplementedError(f"Unknown interpolation function {interpolation_function}")
+    if y_end > y_start:
+        assert y_start <= interpolation_function(x, x_start, x_end, y_start, y_end) <= y_end, f"Value of the interpolation function for x={x} (f(x) = {interpolation_function(x, x_start, x_end, y_start, y_end)})exceeds the inputted range [{y_start}, {y_end}]"
+    elif y_start > y_end:
+        assert y_end <= interpolation_function(x, x_start, x_end, y_start, y_end) <= y_start, f"Value of the interpolation function for x={x} (f(x) = {interpolation_function(x, x_start, x_end, y_start, y_end)})exceeds the inputted range [{y_end}, {y_start}]"
+
+    return interpolation_function(x, x_start, x_end, y_start, y_end)
+
+def sigmoid_between(x, x_start, x_end, y_start, y_end):
+    return y_start + (y_end - y_start) / (1 + np.exp(-0.1*(x - (x_start + x_end)/2)))
+
 def initialize_ax_dict(ax_dict, settings):
     zeeman_color, driving_color, total_color = settings['vector_colors'][0], settings['vector_colors'][1], settings['vector_colors'][2]
     common_kwargs = {"math_fontfamily": math_fontfamily, "size": 20, "alpha": 0}\
@@ -43,6 +66,21 @@ def initialize_ax_dict(ax_dict, settings):
 
 def fade_in_texts(i, t_start, t_end, text_list):
     alpha = (i-t_start)/(t_end-t_start)
+    for text in text_list:
+        text.set_alpha(alpha)
+
+def fade_in_axes(i, t_start, t_end, axes_list):
+    alpha = (i-t_start)/(t_end-t_start)
+    for axis in axes_list:
+        axis.alpha = alpha
+
+def fade_out_axes(i, t_start, t_end, axes_list):
+    alpha = 1 - (i-t_start)/(t_end-t_start)
+    for axis in axes_list:
+        axis.alpha = alpha
+
+def fade_out_texts(i, t_start, t_end, text_list):
+    alpha = 1 - (i-t_start)/(t_end-t_start)
     for text in text_list:
         text.set_alpha(alpha)
 
@@ -88,20 +126,18 @@ def update_bloch_sphere_vectors(i, sphere_dict, ax_dict, B_zeeman_lab, B_drive_l
         ax_dict["bloch_rot"].azim = azim_angle_rot_sphere[i]
         sphere_dict["bloch_rot"].make_sphere()
 
-    phi = np.linspace(settings["phi_0"], settings['phi_end'] + 10*np.pi, t_14-t_0)
-    azim_angle_rot_sphere = (-60 - phi[:] * 180 / np.pi) % 360
-    if t_11 < i <= t_13:
-        B_zeeman_auxvector = np.array([0,0,0])
-        B_total_auxvector = B_drive_lab[0]
-        B_zeeman_auxvector = np.sign(B_zeeman_auxvector)*np.maximum(np.abs(B_zeeman_auxvector), settings['arrow_length'])
-
+    if i > t_11:
+        B_time_index = i - t_0 - 1
         sphere_dict["bloch_rot"].vectors = []
-        sphere_dict["bloch_rot"].add_vectors([B_zeeman_auxvector, B_drive_rot[-1], B_total_auxvector])
-        ax_dict["bloch_rot"].azim = azim_angle_rot_sphere[i]
+        sphere_dict["bloch_rot"].add_vectors([B_drive_rot[B_time_index]])
+
+        if 297.5 <= ax_dict["bloch_rot"].azim <= 302.5:
+            if t_14 - i <= 2*np.pi/settings['vector_rotation_speed_rad']:
+                ax_dict["bloch_rot"].azim = 300
+
+            else:
+                ax_dict["bloch_rot"].azim = azim_angle_rot_sphere[i]
+        else:
+            ax_dict["bloch_rot"].azim = azim_angle_rot_sphere[i]
+
         sphere_dict["bloch_rot"].make_sphere()
-
-
-    # if i > t_13:
-    #     sphere_dict["bloch_rot"].vectors = []
-    #     sphere_dict["bloch_rot"].add_vectors([[0,0,0,],[0,0,0],B_drive_rot[B_time_index]])
-    #     sphere_dict["bloch_rot"].make_sphere()

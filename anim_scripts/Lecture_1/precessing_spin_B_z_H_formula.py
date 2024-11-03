@@ -23,7 +23,7 @@ t_7 = N_time
 # SHORTER DURATIONS FOR DEBUGGING
 ##########################
 
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
    N_time //= 10
