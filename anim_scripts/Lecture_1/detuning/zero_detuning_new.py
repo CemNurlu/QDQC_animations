@@ -24,54 +24,42 @@ from anim_base import (
 ##########################
 # LONGER DURATIONS FOR ACTUAL ANIMATION
 ##########################
-N_time = 800
-t_0 = 20 # Show lab bloch sphere
-t_1 = 100 # Show lab time evolution
-t_2 = 120 # Show H lab text
-t_3 = 160 # Let it sink in for a bit
-t_4 = 180 # Show H lab equation
-t_5 = 220 # Let it sink in for a bit
-t_6 = 240 # Show W transformation equation
-t_7 = 280 # Let it sink in for a bit
-t_8 = 300 # Show rot frame text
-t_9 = 340 # Let it sink in for a bit
-t_10 = 384 # Show rot frame equation
-t_11 = 438 # Let it sink in for a bit
-t_12 = 500 # Show B_rot bloch sphere
-t_13 = 548 # Show time evolution of B_rot
-t_14 = 620 # Fade out the left side
-t_15 = 650
-t_16 = N_time
+N_time = 750
+t_0 = 20 # Lab bloch sphere is fully on the screen
+t_1 = 100 # Total Hamiltonian arrow and first row text start fading in
+t_2 = 120 # Total Hamiltonian arrow and first row text stop fading in
+t_3 = 160 # Second row equations starts fading in
+t_4 = 180 # Second row equations stop fading in
+t_5 = 220 # Rotating frame arrow and text start fading in
+t_6 = 240 # Rotating frame arrow an text stop fading in
+t_7 = 280 # Rotating frame total Hamiltonian equation first row and bloch sphere start fading in
+t_8 = 300 # Rotating frame total Hamiltonian equation first row and bloch sphere stop fading in, bloch vectors start evolving
+t_9 = 340 # Second and third row equation rotating frame start fading in
+t_10 = 360 # Second and third row equation rotating frame stop fading in
+t_11 = 438 # Bloch vectors arrive at their final position
+t_12 = 500 # Lab bloch sphere, equations and arrow start fading out
+t_13 = 530 # Lab bloch sphere, equations and arrow stop fading out, rotating frame bloch sphere starts moving (and stops rotating)
+t_14 = 570 # Rotating frame bloch sphere stops moving, pretty axes start fading, spin vector in bloch sphere starts appearing
+t_15 = 600 # Pretty axes stop fading, spin vector in bloch sphere starts rotating and plots start getting drawn
+t_16 = N_time # Spin vector in bloch sphere stops rotating and plots stop getting drawn
+time_list = (t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9, t_10, t_11, t_12, t_13, t_14, t_15, t_16)
 
 ##########################
 # SHORTER DURATIONS FOR DEBUGGING
 ##########################
 DEBUG = False
+show_time_list = False
 if DEBUG:
     N_time //= 10
-    t_0 //= 10
-    t_1 //= 10
-    t_2 //= 10
-    t_3 //= 10
-    t_4 //= 10
-    t_5 //= 10
-    t_6 //= 10
-    t_7 //= 10
-    t_8 //= 10
-    t_9 //= 10
-    t_10 //= 10
-    t_11 //= 10
-    t_12 //= 10
-    t_13 //= 10
-    t_14 //= 10
-    t_15 //= 10
-    t_16 //= 10
+    time_list = [t // 10 for t in time_list]
+    t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9, t_10, t_11, t_12, t_13, t_14, t_15 = time_list
 
-time_list = (t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9, t_10, t_11, t_12, t_13, t_14, t_15)
+
 bloch_mosaic = [["bloch_lab", "plot_between", "bloch_rot"],
                 ["plot", "plot", "plot"]]
 
 settings = {
+    "detuning": "zero",
     "B_x_max": 0.7,
     "B_zeeman_lab_z": 1,
     "phi_0": 0,
@@ -83,8 +71,8 @@ settings = {
     "intial_sphere_alpha": 0.2,
     "initial_frame_alpha": 0.2,
     "intial_font_alpha": 1,
-    "vector_rotation_speed_rad": 24*np.pi/528,
-    "rabi_frequency": 5/528 * np.pi,#48*np.pi/528,
+    "vector_rotation_speed_rad": 24/528 * np.pi,
+    "rabi_frequency": 4/100 * np.pi,
     "spin_vector_color": "blue",
     "tail_length": 6,
 }
@@ -92,11 +80,11 @@ settings = {
 bloch_kwargs = [{
     "vector_color": settings['vector_colors'],
     "vector_alpha" : [1,1,0],
-    "vector_width": 6,
+    "vector_width": 3,
     },
     {
     "vector_color": settings['vector_colors'][:],
-    "vector_width": 6,
+    "vector_width": 3,
     "xlabel": [r"$x^\prime$", ''],
     "ylabel": [r"$y^\prime$", '']
     }
@@ -123,11 +111,17 @@ B_lab_H_text, B_lab_H_zeeman_text, B_lab_H_drive_text, B_lab_H_zeeman_eq, B_lab_
 B_rot_H_text, B_rot_H_zeeman_text, B_rot_H_drive_text, B_rot_H_zeeman_eq, B_rot_H_drive_eq_1, B_rot_H_drive_eq_2 = B_rot_texts
 W_trans_equation, W_trans_arrow, omega_is_omega_L = transformation_texts
 
+if show_time_list:
+    new_ax = fig.add_axes([0.9, 0.9, 0.1, 0.1])
+
 def animate(i):
-    first = True
+    if i in time_list and show_time_list:
+        index_in_time_list = list(time_list).index(i)
+        new_ax.cla()
+        new_ax.text(0, 0.5, f"t_{index_in_time_list:.0f}: t = {i}", fontsize=20, ha='center', va='center')
     if i <= t_0:
         sphere_dict["bloch_lab"].make_sphere()
-    if t_0 < i <= t_14:
+    if t_0 < i <= t_12:
         update_bloch_sphere_vectors(
             i, sphere_dict, ax_dict, B_zeeman_lab, B_drive_lab, B_total_lab, B_drive_rot, azim_angle_rot_sphere, settings
         )
@@ -141,29 +135,14 @@ def animate(i):
         fade_in_texts(i, t_7, t_8, [B_rot_H_text, B_rot_H_zeeman_text, B_rot_H_drive_text])
     if t_9 < i <= t_10:
         fade_in_texts(i, t_9, t_10, [B_rot_H_zeeman_eq, B_rot_H_drive_eq_1, B_rot_H_drive_eq_2])
-    if t_13 < i <= t_14:
-        if first:
-            current_position = ax_dict['bloch_rot'].get_position()
-            first = False
+    if t_12 < i <= t_13:
+        new_alpha_sphere = max(0, (t_13 - i) / (t_13 - t_12) * settings['initial_frame_alpha'])
+        new_alpha_font = max(0, (t_13 - i) / (t_13 - t_12) * settings['intial_font_alpha'])
 
-        new_alpha_sphere = max(0, (t_14 - i) / (t_14 - t_13) * settings['initial_frame_alpha'])
-        new_alpha_font = max(0, (t_14 - i) / (t_14 - t_13) * settings['intial_font_alpha'])
-
-        new_height = interpolate_between(i, t_13, t_14, current_position.height, 0.8)
-        new_width = interpolate_between(i, t_13, t_14, current_position.width, 0.5)
-        new_y_pos = interpolate_between(i, t_13, t_14, current_position.y0, 0.1)
-
-        next_position = [
-            current_position.x0 - (current_position.x0 - ax_dict['bloch_lab'].get_position().x0) * (i - t_13) / (t_14 - t_13),
-            new_y_pos,
-            new_width,
-            new_height
-        ]
-        ax_dict['bloch_rot'].set_position(next_position)
         sphere_dict['bloch_lab'].sphere_alpha = new_alpha_sphere
         sphere_dict['bloch_lab'].frame_alpha = new_alpha_sphere
         sphere_dict['bloch_lab'].font_color = (0, 0, 0, new_alpha_font)
-        sphere_dict['bloch_lab'].frame_width *= (t_14 - i)/(t_14-t_13)
+        sphere_dict['bloch_lab'].frame_width *= (t_13 - i)/(t_13-t_12)
         sphere_dict["bloch_lab"].vector_alpha = [new_alpha_sphere, new_alpha_sphere, new_alpha_sphere]
         sphere_dict['bloch_lab'].make_sphere()
 
@@ -174,14 +153,29 @@ def animate(i):
             [B_rot_H_text, B_rot_H_zeeman_text, B_rot_H_drive_text] +
             [B_rot_H_zeeman_eq, B_rot_H_drive_eq_1, B_rot_H_drive_eq_2]
         )
-        fade_out_texts(i, t_13, t_14, all_texts_to_fade)
-        if i == t_14:
+        fade_out_texts(i, t_12, t_13, all_texts_to_fade)
+        if i == t_13:
+            global lab_sphere_position
+            lab_sphere_position = ax_dict['bloch_lab'].get_position()
             fig.delaxes(ax_dict['bloch_lab'])
+
+    if t_13 < i <= t_14:
+        current_position = ax_dict['bloch_rot'].get_position()
+        new_height = interpolate_between(i, t_13, t_14, current_position.height, 0.8)
+        new_width = interpolate_between(i, t_13, t_14, current_position.width, 0.5)
+        new_y_pos = interpolate_between(i, t_13, t_14, current_position.y0, 0.1)
+        new_x_pos = interpolate_between(i, t_13, t_14, current_position.x0, lab_sphere_position.x0)
+        next_position = [new_x_pos, new_y_pos, new_width, new_height]
+        ax_dict['bloch_rot'].set_position(next_position)
+
+    if t_14 < i <= t_15:
+        if i == t_14 + 1:
             ax_dict['spin_statistics'] = fig.add_axes((0.6, 0.2, 0.4, 0.6))
             ax_dict['spin_statistics'].set_axis_off()
             global pretty_axis_spin_statistics
             global pretty_axis_x_spin
             global pretty_axis_y_spin
+
             pretty_axis_spin_statistics = PrettyAxis(ax_dict['spin_statistics'], (0, 5, 4.5), (1, 8, 0), (0, 1), (-1., 1), alpha=1)
             pretty_axis_spin_statistics.add_line("spin_z", 1, 1, c='blue', alpha=1)
             pretty_axis_spin_statistics.add_label(r"$\langle \sigma_z \rangle$", "y", size=20)
@@ -197,8 +191,7 @@ def animate(i):
             pretty_axis_y_spin.add_label(r"$\langle \sigma_y \rangle$", "y", size=20)
             pretty_axis_y_spin.add_label(r"$t$", "x", size=20)
 
-    if t_14 < i <= t_15:
-        fade_in_axes(i, t_14, t_15, [pretty_axis_spin_statistics])
+        fade_in_axes(i, t_14, t_15, [pretty_axis_spin_statistics, pretty_axis_x_spin, pretty_axis_y_spin])
         sphere_dict['bloch_rot'].vectors = []
         sphere_dict['bloch_rot'].add_vectors([initial_bloch_vector, B_drive_rot[i - t_14 + 1]])
         sphere_dict['bloch_rot'].vector_alpha = [(i-t_14)/(t_15-t_14), 1]
@@ -218,7 +211,7 @@ def animate(i):
         tail_length = min(settings['tail_length'], len(all_spinz_vals))
         tail_points = precessing_bloch_vector[i-t_15-tail_length+1:i-t_15+2]
         sphere_dict['bloch_rot'].vectors = []
-        sphere_dict['bloch_rot'].add_vectors([precessing_bloch_vector[i-t_15+1], B_drive_rot[i - t_14 + 1]])
+        sphere_dict['bloch_rot'].add_vectors([precessing_bloch_vector[i-t_15+1], B_drive_rot[i - t_15 + 1]])
         sphere_dict['bloch_rot'].points = []
         sphere_dict['bloch_rot'].add_points([tail_points[:,0], tail_points[:,1], tail_points[:,2]], meth="l")
         sphere_dict['bloch_rot'].make_sphere()

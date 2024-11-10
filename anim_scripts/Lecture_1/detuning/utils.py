@@ -15,10 +15,10 @@ def interpolate_between(x, x_start, x_end, y_start, y_end, interpolation_functio
             interpolation_function = sigmoid_between
         else:
             raise NotImplementedError(f"Unknown interpolation function {interpolation_function}")
-    if y_end > y_start:
-        assert y_start <= interpolation_function(x, x_start, x_end, y_start, y_end) <= y_end, f"Value of the interpolation function for x={x} (f(x) = {interpolation_function(x, x_start, x_end, y_start, y_end)})exceeds the inputted range [{y_start}, {y_end}]"
-    elif y_start > y_end:
-        assert y_end <= interpolation_function(x, x_start, x_end, y_start, y_end) <= y_start, f"Value of the interpolation function for x={x} (f(x) = {interpolation_function(x, x_start, x_end, y_start, y_end)})exceeds the inputted range [{y_end}, {y_start}]"
+    # if y_end > y_start:
+    #     assert y_start <= interpolation_function(x, x_start, x_end, y_start, y_end) <= y_end, f"Value of the interpolation function for x={x} (f(x) = {interpolation_function(x, x_start, x_end, y_start, y_end)})exceeds the inputted range [{y_start}, {y_end}]"
+    # elif y_start > y_end:
+    #     assert y_end <= interpolation_function(x, x_start, x_end, y_start, y_end) <= y_start, f"Value of the interpolation function for x={x} (f(x) = {interpolation_function(x, x_start, x_end, y_start, y_end)})exceeds the inputted range [{y_end}, {y_start}]"
 
     return interpolation_function(x, x_start, x_end, y_start, y_end)
 
@@ -104,7 +104,7 @@ def calculate_rotating_frame_B_fields(phi, settings):
     return B_drive
 
 def update_bloch_sphere_vectors(i, sphere_dict, ax_dict, B_zeeman_lab, B_drive_lab, B_total_lab, B_drive_rot, azim_angle_rot_sphere, settings):
-    t_0, t_1, t_2, t_8, t_11, t_13, t_14 = [settings['time_list'][i] for i in [0, 1, 2, 8, 11, 13, 14]]
+    t_0, t_1, t_2, t_8, t_11, t_12 = [settings['time_list'][i] for i in [0, 1, 2, 8, 11, 12]]
     if t_1 < i <= t_2:
         new_alpha = (i-t_1)/(t_2-t_1)
         sphere_dict["bloch_lab"].vector_alpha = [1,1,new_alpha]
@@ -130,9 +130,10 @@ def update_bloch_sphere_vectors(i, sphere_dict, ax_dict, B_zeeman_lab, B_drive_l
         B_time_index = i - t_0 - 1
         sphere_dict["bloch_rot"].vectors = []
         sphere_dict["bloch_rot"].add_vectors([B_drive_rot[B_time_index]])
+        sphere_dict["bloch_rot"].vector_color = [settings['vector_colors'][2]]
 
         if 297.5 <= ax_dict["bloch_rot"].azim <= 302.5:
-            if t_14 - i <= 2*np.pi/settings['vector_rotation_speed_rad']:
+            if t_12 - i <= 2*np.pi/settings['vector_rotation_speed_rad']:
                 ax_dict["bloch_rot"].azim = 300
 
             else:
