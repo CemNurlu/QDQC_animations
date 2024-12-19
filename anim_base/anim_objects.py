@@ -522,7 +522,7 @@ class PrettySlider(PrettyObject):
 
         if self.horizontal:
             dot_x_pos = self.x_pos[0] + (self.slider_dot_data - self.data_lim[0]) / (self.data_lim[1] - self.data_lim[0]) * (self.x_pos[1] - self.x_pos[0])
-            self.ax_objects['slider_dot'].set_xdata(dot_x_pos)
+            self.ax_objects['slider_dot'].set_xdata([dot_x_pos])
         else:
             dot_y_pos = self.y_pos[0] + (self.slider_dot_data - self.data_lim[0]) / (self.data_lim[1] - self.data_lim[0]) * (self.y_pos[1] - self.y_pos[0])
             self.ax_objects['slider_dot'].set_ydata(dot_y_pos)
