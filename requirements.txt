@@ -2,5 +2,5 @@ numpy
 qutip
 matplotlib
 tqdm
-moviepy
+moviepy==1.0.3
 scipy
