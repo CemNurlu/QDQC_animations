@@ -1,0 +1,111 @@
+Folder PATH listing for volume OS
+Volume serial number is 40DA-B74E
+C:.
+¦   .gitignore
+¦   README.md
+¦   requirements.txt
+¦   run_all_animations.py
+¦   tree.txt
+¦   __init__.py
+¦   
++---animations
+¦   +---test
+¦           bloch_coupling_different_omega_trans1V2_new.mp4
+¦           bloch_coupling_same_omega_new.mp4
+¦           zero_detuning_new_final.mp4
+¦           
++---anim_base
+¦   ¦   anim_objects.py
+¦   ¦   config.py
+¦   ¦   spin2D.py
+¦   ¦   util.py
+¦   ¦   __init__.py
+¦   ¦   
+¦   +---__pycache__
+¦           anim_objects.cpython-310.pyc
+¦           anim_objects.cpython-311.pyc
+¦           anim_objects.cpython-313.pyc
+¦           anim_objects.cpython-38.pyc
+¦           anim_objects.cpython-39.pyc
+¦           bloch_sphere.cpython-38.pyc
+¦           config.cpython-310.pyc
+¦           config.cpython-311.pyc
+¦           config.cpython-313.pyc
+¦           config.cpython-38.pyc
+¦           config.cpython-39.pyc
+¦           spin2D.cpython-311.pyc
+¦           spin2D.cpython-313.pyc
+¦           spin2D.cpython-38.pyc
+¦           util.cpython-310.pyc
+¦           util.cpython-311.pyc
+¦           util.cpython-312.pyc
+¦           util.cpython-313.pyc
+¦           util.cpython-38.pyc
+¦           util.cpython-39.pyc
+¦           __init__.cpython-310.pyc
+¦           __init__.cpython-311.pyc
+¦           __init__.cpython-312.pyc
+¦           __init__.cpython-313.pyc
+¦           __init__.cpython-38.pyc
+¦           __init__.cpython-39.pyc
+¦           
++---anim_scripts
+    ¦   run_all_animations.py
+    ¦   __init__.py
+    ¦   
+    +---Lecture_0
+    ¦   ¦   dynamics_T2_new.py
+    ¦   ¦   hom_broadening_L0_new.py
+    ¦   ¦   hom_broadening_L0_timo.py
+    ¦   ¦   hom_broadening_L0_utils.py
+    ¦   ¦   inhom_broadening_new.py
+    ¦   ¦   precessing_spin_B_z_decay_new.py
+    ¦   ¦   precessing_spin_B_z_new.py
+    ¦   ¦   
+    ¦   +---__pycache__
+    ¦           hom_broadening_L0_utils.cpython-311.pyc
+    ¦           
+    +---Lecture_1
+    ¦   ¦   decomposed_Bx.py
+    ¦   ¦   driving_field_rot_frame_transformation.py
+    ¦   ¦   precessing_spin_B_z_H_formula.py
+    ¦   ¦   spin_precession_rot_frame_transformation
+    ¦   ¦   
+    ¦   +---rabi_driving
+    ¦       ¦   detuned_rabi_driving.py
+    ¦       ¦   testing.ipynb
+    ¦       ¦   utils.py
+    ¦       ¦   
+    ¦       +---__pycache__
+    ¦               utils.cpython-311.pyc
+    ¦               utils.cpython-313.pyc
+    ¦               
+    +---Lecture_2
+    ¦   +---spin_coupling_2D
+    ¦   ¦       flipping_spins_new.py
+    ¦   ¦       local_fluctuations2D.py
+    ¦   ¦       local_fluctuations2D_new.py
+    ¦   ¦       spin1_dephase.py
+    ¦   ¦       whole_picture_new.py
+    ¦   ¦       
+    ¦   +---spin_coupling_bloch_sphere
+    ¦           bloch_coupling_different_omega_trans1.py
+    ¦           bloch_coupling_different_omega_trans1_new.py
+    ¦           bloch_coupling_different_omega_trans2.py
+    ¦           bloch_coupling_different_omega_trans2_new.py
+    ¦           bloch_coupling_same_omega.py
+    ¦           bloch_coupling_same_omega_new.py
+    ¦           
+    +---Lecture_5
+    ¦   +---Shaking Spins
+    ¦           setup_whole_picture.py
+    ¦           shaking_spins_flip.py
+    ¦           shaking_spins_splitting.py
+    ¦           shaking_whole_picture.py
+    ¦           
+    +---Lecture_6
+    ¦       HahnEcho.py
+    ¦       
+    +---__pycache__
+            __init__.cpython-313.pyc
+            

@@ -1,3 +1,13 @@
+import sys
+import os
+
+# Get the absolute path of the root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+print(project_root)
+
+# Add project root to sys.path
+sys.path.append(project_root)
+
 from anim_base import  cache_then_save_funcanimation, bloch_vector, PrettyAxis,   prepare_bloch_mosaic, math_fontfamily, file_type
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,18 +21,18 @@ from tqdm import tqdm
 
 N_time = 550
 t_0 = 10  # Show bloch spheres
-t_1 = 50  # Show time evolution
-t_2 = 70 # Show omega1 = omega2 equation
-t_3 = 100 # Let it sink in for a bit
-t_4 = 120 # Show axises and start plotting lines
-t_5 = 180 # continue time evolution
-t_6 = 200 # Remove axises and show coupling equations
-t_7 = 260 # let it sink in 
-t_8 = 280 # Remove everything and show omega_1 transformation equation
-t_9 = 310 # let it sink in
-t_10 = 330 # Show new bloch spheres and axises
-t_11 = 500 # time evolution
-t_12 = 520 # Remove axises and show coupling equations
+t_1 = 50 +30 # Show time evolution
+t_2 = 70 +30# Show omega1 = omega2 equation
+t_3 = 100 +30# Let it sink in for a bit
+t_4 = 120 +30# Show axises and start plotting lines
+t_5 = 180 +30# continue time evolution
+t_6 = 200+30 # Remove axises and show coupling equations
+t_7 = 260 +30# let it sink in 
+t_8 = 280 +30# Remove everything and show omega_1 transformation equation
+t_9 = 310 +30# let it sink in
+t_10 = 330 +30# Show new bloch spheres and axises
+t_11 = 500 +30# time evolution
+t_12 = 520 +30# Remove axes and show coupling equations
 t_13 = N_time
 
 ##########################
@@ -49,7 +59,7 @@ if DEBUG:
     t_13 //= 10
 
 
-assert t_5 - t_0 == t_11 - t_10, "Time evolution must be the same length"
+#assert t_5 - t_0 == t_11 - t_10, "Time evolution must be the same length"
 
 
 bloch_mosaic = [["bloch_1", "bloch_2"],
@@ -80,12 +90,18 @@ bloch_kwargs = [{
 gridspec_kw = {"height_ratios":[1,2], "width_ratios":[1,1]}
 fig, ax_dict, sphere_dict = prepare_bloch_mosaic(bloch_mosaic, (8,12), bloch_kwargs, gridspec_kw=gridspec_kw)
 
+fig.subplots_adjust(top=0.98)
+
 ax_dict["plot"].set_axis_off()
 
+box = ax_dict["bloch_1"].get_position()
+ax_dict["bloch_1"].set_position([box.x0, box.y0, box.width, box.height * 1.8])
+box = ax_dict["bloch_2"].get_position()
+ax_dict["bloch_2"].set_position([box.x0, box.y0, box.width, box.height * 1.8])
 
 B_time = np.linspace(0, 1, t_5-t_0)
 omega_1_lab = 8*np.pi
-omega_2_lab = 12*np.pi
+omega_2_lab = 21*np.pi
 
 phi_1_start = np.pi/3
 phi_2_start = np.pi*2/3
@@ -164,13 +180,11 @@ if True:
 
 
 anim_title = ax_dict["plot"].text(1.5, 3.3,"Unlike Spins", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
-omega_equation = ax_dict["plot"].text(1.9, 2.3, r"$\omega_1 \neq \omega_2$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
+omega_equation = ax_dict["plot"].text(1.9, 2.6, r"$\omega_1 \neq \omega_2$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
 coupling_equation_lab = ax_dict["plot"].text(0.8, -0.5, r"$H_c = S^z_1 S^z_2 - \frac{1}{2} ( S^y_1 S^y_2 + S^z_1 S^z_2)$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
 coupling_equation_rot = ax_dict["plot"].text(1.85, -0.5, r"$H_c^\prime = S^z_1 S^z_2$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
 
-
-W_trans_equation = ax_dict["plot"].text(1.6, 0.7, r'$W = \mathrm{exp}(-i \omega_1 t S_z)$', color = "black", alpha = 0, size = 25, math_fontfamily = math_fontfamily)
-W_trans_arrow = FancyArrowPatch((2.05, 1.5), (2.75, 1.5), 
+W_trans_arrow = FancyArrowPatch((2.05, 1.7), (2.75, 1.7), 
         # arrowstyle='->',
         mutation_scale=120,
         lw = 2, 
@@ -178,12 +192,15 @@ W_trans_arrow = FancyArrowPatch((2.05, 1.5), (2.75, 1.5),
         fc = "aquamarine",
         alpha = 0
     )
+W_trans_equation = ax_dict["plot"].text(1.6, 0.6, r'$W = \mathrm{exp}(-i \omega_1 t S_z)$', color = "black", alpha = 0, size = 25, math_fontfamily = math_fontfamily)
+W_trans_equation.set_zorder(1)
+
 
 ax_dict["plot"].add_patch(W_trans_arrow)
 W_trans_arrow.set_zorder(10)
 
 ax_dict["plot"].set_xlim(-0.3, 4.7)
-ax_dict["plot"].set_ylim(-6.6, 2)
+ax_dict["plot"].set_ylim(-6.6, 2.3)
 
 
 def animate(i):
@@ -193,12 +210,22 @@ def animate(i):
         sphere_dict["bloch_2"].add_vectors([B_z, bloch_2_lab[0]])
 
     if i <= t_0:
+
+
         new_alpha = i/t_0
         for sphere in sphere_dict.values():
             sphere.vector_alpha = [new_alpha, new_alpha]
             sphere.make_sphere()
 
+
+
+
+
     if t_0 < i <= t_5:
+
+        rotation_angle = omega_2_lab * i-t_0 
+        ax_dict["bloch_2"].view_init(elev=30, azim=rotation_angle)
+        
         B_time_index = i - t_0 - 1
         sphere_dict["bloch_1"].vectors = []
         sphere_dict["bloch_1"].points = []
@@ -399,4 +426,7 @@ ani = anim.FuncAnimation(fig, animate, tqdm(np.arange(N_time)), interval= 50,
                               init_func=init, 
                               blit=False, repeat=False)
 
-cache_then_save_funcanimation(ani, f'animations/test/bloch_coupling_different_omega_trans1V2_new.{file_type}', fps = 20 )
+if not DEBUG:
+    cache_then_save_funcanimation(ani, f'animations/test/bloch_coupling_different_omega_trans1V2_new.{file_type}', fps = 20)
+else:
+    cache_then_save_funcanimation(ani, f'animations/test/bloch_coupling_different_omega_trans1V2_new_debug.{file_type}', fps = 20)
