@@ -1,3 +1,13 @@
+import sys
+import os
+
+# Get the absolute path of the root directory
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+print(project_root)
+
+# Add project root to sys.path
+sys.path.append(project_root)
+
 from anim_base import  cache_then_save_funcanimation, bloch_vector, PrettyAxis,   prepare_bloch_mosaic, math_fontfamily, file_type
 import numpy as np
 import matplotlib.pyplot as plt
@@ -82,6 +92,10 @@ fig, ax_dict, sphere_dict = prepare_bloch_mosaic(bloch_mosaic, (8,12), bloch_kwa
 
 ax_dict["plot"].set_axis_off()
 
+box = ax_dict["bloch_1"].get_position()
+ax_dict["bloch_1"].set_position([box.x0, box.y0, box.width, box.height * 1.8])
+box = ax_dict["bloch_2"].get_position()
+ax_dict["bloch_2"].set_position([box.x0, box.y0, box.width, box.height * 1.8])
 
 B_time = np.linspace(0, 1, t_5-t_0)
 omega_1_lab = 12*np.pi
@@ -165,12 +179,12 @@ if True:
 
 anim_title = ax_dict["plot"].text(1.7, 3.3,"Like Spins", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
 omega_equation = ax_dict["plot"].text(1.9, 2.3,r"$\omega_1 = \omega_2$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
-coupling_equation_lab = ax_dict["plot"].text(0.8, -0.5, r"$H_c = S^z_1 S^z_2 - \frac{1}{2} ( S^y_1 S^y_2 + S^z_1 S^z_2)$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
+coupling_equation_lab = ax_dict["plot"].text(0.85, -0.5, r"$H_c = S^z_1 S^z_2 - \frac{1}{2} ( S^y_1 S^y_2 + S^x_1 S^x_2)$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
 coupling_equation_rot = ax_dict["plot"].text(0.6, -0.5, r"$H_c^\prime = H_c =  S^z_1 S^z_2 - \frac{1}{2} ( S^y_1 S^y_2 + S^z_1 S^z_2)$", color = "black", alpha = 0, size = 30, math_fontfamily = math_fontfamily)
 
 
 W_trans_equation = ax_dict["plot"].text(1.6, 0.7, r'$W = \mathrm{exp}(-i \omega_1 t S_z)$', color = "black", alpha = 0, size = 25, math_fontfamily = math_fontfamily)
-W_trans_arrow = FancyArrowPatch((2.05, 1.5), (2.75, 1.5), 
+W_trans_arrow = FancyArrowPatch((2.05, 1.7), (2.75, 1.7), 
         # arrowstyle='->',
         mutation_scale=120,
         lw = 2, 
@@ -183,7 +197,7 @@ ax_dict["plot"].add_patch(W_trans_arrow)
 W_trans_arrow.set_zorder(10)
 
 ax_dict["plot"].set_xlim(-0.3, 4.7)
-ax_dict["plot"].set_ylim(-6.6, 2)
+ax_dict["plot"].set_ylim(-6.6, 2.3)
 
 
 def animate(i):
@@ -221,7 +235,7 @@ def animate(i):
         if B_time_index > 0:
             sphere_dict["bloch_2"].add_points([points_2[:,0], points_2[:,1], points_2[:,2]], meth="l")
         sphere_dict["bloch_2"].make_sphere()
-
+   
         if i == t_3:
             pretty_axis_spin1_x.add_line("spin1_x", B_time[:B_time_index+1], bloch_1_lab[:B_time_index+1,0], c = spin1_vector_colors[1])
             pretty_axis_spin1_y.add_line("spin1_y", B_time[:B_time_index+1], bloch_1_lab[:B_time_index+1,1], c = spin1_vector_colors[1])

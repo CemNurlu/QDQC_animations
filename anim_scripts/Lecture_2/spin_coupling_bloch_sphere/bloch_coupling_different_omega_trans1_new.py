@@ -21,18 +21,18 @@ from tqdm import tqdm
 
 N_time = 550
 t_0 = 10  # Show bloch spheres
-t_1 = 50 +30 # Show time evolution
-t_2 = 70 +30# Show omega1 = omega2 equation
-t_3 = 100 +30# Let it sink in for a bit
-t_4 = 120 +30# Show axises and start plotting lines
-t_5 = 180 +30# continue time evolution
-t_6 = 200+30 # Remove axises and show coupling equations
-t_7 = 260 +30# let it sink in 
-t_8 = 280 +30# Remove everything and show omega_1 transformation equation
-t_9 = 310 +30# let it sink in
-t_10 = 330 +30# Show new bloch spheres and axises
-t_11 = 500 +30# time evolution
-t_12 = 520 +30# Remove axes and show coupling equations
+t_1 = 80 # Show time evolution
+t_2 = 100# Show omega1 = omega2 equation
+t_3 = 130# Let it sink in for a bit
+t_4 = 150# Show axises and start plotting lines
+t_5 = 210# continue time evolution
+t_6 = 230 # Remove axises and show coupling equations
+t_7 = 290# let it sink in 
+t_8 = 310# Remove everything and show omega_1 transformation equation
+t_9 = 340# let it sink in
+t_10 = 360# Show new bloch spheres and axises
+t_11 = 530# time evolution
+t_12 = 550# Remove axes and show coupling equations
 t_13 = N_time
 
 ##########################
@@ -56,7 +56,7 @@ if DEBUG:
     t_10 //= 10
     t_11 //= 10
     t_12 //= 10
-    t_13 //= 10
+    t_13 //= 10 
 
 
 #assert t_5 - t_0 == t_11 - t_10, "Time evolution must be the same length"
@@ -223,8 +223,6 @@ def animate(i):
 
     if t_0 < i <= t_5:
 
-        rotation_angle = omega_2_lab * i-t_0 
-        ax_dict["bloch_2"].view_init(elev=30, azim=rotation_angle)
         
         B_time_index = i - t_0 - 1
         sphere_dict["bloch_1"].vectors = []
@@ -250,6 +248,11 @@ def animate(i):
         if B_time_index > 0:
             sphere_dict["bloch_2"].add_points([points_2[:,0], points_2[:,1], points_2[:,2]], meth="l")
         sphere_dict["bloch_2"].make_sphere()
+
+
+        if i > t_3:
+            reverse_rot = -np.degrees(phi_2_lab[B_time_index])
+            ax_dict["bloch_2"].view_init(elev=30, azim=-reverse_rot)
 
         if i == t_3:
             pretty_axis_spin1_x.add_line("spin1_x", B_time[:B_time_index+1], bloch_1_lab[:B_time_index+1,0], c = spin1_vector_colors[1])
@@ -351,7 +354,7 @@ def animate(i):
 
             pretty_axis_spin2_x.update_line("spin2_x", B_time[:1], bloch_2_lab[:1,0])
             pretty_axis_spin2_y.update_line("spin2_y", B_time[:1], bloch_2_lab[:1,1])
-            pretty_axis_spin2_z.update_line("spin2_z", B_time[:1], bloch_2_lab[:,2])
+            pretty_axis_spin2_z.update_line("spin2_z", B_time[:1], bloch_2_lab[:1,2])
         
         new_alpha = (i - t_9)/(t_10-t_9)
         pretty_axis_spin1_x.alpha = new_alpha
